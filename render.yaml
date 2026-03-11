@@ -21,8 +21,13 @@ services:
       - key: DEBUG
         value: "False"
       - key: ALLOWED_HOSTS
-        value: "localhost,127.0.0.1"
+        value: ".onrender.com,localhost,127.0.0.1"
       - key: GEMINI_API_KEY
         sync: false
+      - key: RENDER_EXTERNAL_HOSTNAME
+        fromService:
+          type: web
+          name: wovenry
+          property: host
       - key: PYTHON_VERSION
         value: "3.13.0"
