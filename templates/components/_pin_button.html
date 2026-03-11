@@ -1,0 +1,7 @@
+<button
+    hx-post="{% url pin_url pk=item.pk %}"
+    hx-swap="outerHTML"
+    class="text-sm {% if item.is_pinned %}text-yellow-500{% else %}text-gray-400 hover:text-yellow-500{% endif %} transition"
+    title="{% if item.is_pinned %}Unpin{% else %}Pin{% endif %}">
+    &#9733;
+</button>

@@ -1,0 +1,30 @@
+{% load wovenry_tags %}
+
+{% if pinned %}
+<div class="mb-6">
+    <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Pinned Projects</h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {% for item in pinned %}
+        {% include "components/_tile_project.html" with project=item show_controls=True %}
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<div>
+    <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">
+        {% if pinned %}Recent Projects{% else %}My Projects{% endif %}
+    </h2>
+    {% if recent %}
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {% for item in recent %}
+        {% include "components/_tile_project.html" with project=item show_controls=True %}
+        {% endfor %}
+    </div>
+    {% elif not pinned %}
+    <div class="text-center py-12 text-gray-400">
+        <p class="text-lg mb-2">No projects yet</p>
+        <p class="text-sm">Create your first project to organize your metaprompts.</p>
+    </div>
+    {% endif %}
+</div>

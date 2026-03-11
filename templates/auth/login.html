@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Login — Wovenry{% endblock %}
+{% block content %}
+<div class="max-w-md mx-auto mt-16">
+    <div class="bg-white rounded-xl shadow-sm border p-8">
+        <h1 class="text-2xl font-bold text-gray-900 mb-6 text-center">Sign in to Wovenry</h1>
+
+        {% if form.non_field_errors %}
+        <div class="bg-red-50 text-red-700 p-3 rounded-lg mb-4 text-sm">
+            {% for error in form.non_field_errors %}{{ error }}{% endfor %}
+        </div>
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Username</label>
+                    {{ form.username }}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                    {{ form.password }}
+                </div>
+                <button type="submit" class="w-full bg-brand-600 text-white py-2.5 px-4 rounded-lg hover:bg-brand-700 font-medium transition">
+                    Sign In
+                </button>
+            </div>
+        </form>
+
+        <p class="text-center text-sm text-gray-500 mt-6">
+            Have an invite? <a href="{% url 'register' %}" class="text-brand-600 hover:underline">Create account</a>
+        </p>
+    </div>
+</div>
+{% endblock %}

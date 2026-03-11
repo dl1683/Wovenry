@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% block title %}{% if creating %}New Metaprompt{% else %}Edit: {{ metaprompt.title }}{% endif %} — Wovenry{% endblock %}
+{% block content %}
+<div class="max-w-3xl mx-auto">
+    <div class="flex items-center justify-between mb-6">
+        <h1 class="text-2xl font-bold text-gray-900">Metaprompt Editor</h1>
+        {% if metaprompt %}
+        <div class="flex items-center gap-3">
+            <!-- Status controls -->
+            {% if metaprompt.status == "draft" %}
+            <form method="post" action="{% url 'metaprompt-publish' pk=metaprompt.pk %}">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="publish">
+                <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-700 transition font-medium">
+                    Publish
+                </button>
+            </form>
+            {% else %}
+            <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-medium">Published</span>
+            <form method="post" action="{% url 'metaprompt-publish' pk=metaprompt.pk %}">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="draft">
+                <button type="submit" class="text-sm text-gray-500 hover:text-gray-700">Revert to Draft</button>
+            </form>
+            {% endif %}
+
+            <!-- Visibility -->
+            {% if metaprompt.status == "published" %}
+                {% if metaprompt.visibility == "private" %}
+                <button
+                    hx-get="{% url 'metaprompt-categories' pk=metaprompt.pk %}"
+                    hx-target="#modal-container"
+                    hx-swap="innerHTML"
+                    class="bg-gray-100 text-gray-600 px-3 py-1 rounded-lg text-sm hover:bg-gray-200 transition">
+                    Private — Make Public
+                </button>
+                {% else %}
+                <form method="post" action="{% url 'metaprompt-visibility' pk=metaprompt.pk %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="visibility" value="private">
+                    <button type="submit" class="bg-green-100 text-green-700 px-3 py-1 rounded-lg text-sm hover:bg-green-200 transition">Public</button>
+                </form>
+                {% endif %}
+            {% else %}
+            <span class="text-xs text-gray-400">Publish first to change visibility</span>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="bg-white rounded-xl border p-6">
+        <form method="post">
+            {% csrf_token %}
+            <div class="space-y-5">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Title *</label>
+                    {{ form.title }}
+                    {% if form.title.errors %}<p class="text-red-600 text-sm mt-1">{{ form.title.errors.0 }}</p>{% endif %}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Metaprompt Content (Template Editable)</label>
+                    {{ form.content }}
+                    {% if form.content.errors %}<p class="text-red-600 text-sm mt-1">{{ form.content.errors.0 }}</p>{% endif %}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Description (Optional)</label>
+                    {{ form.description }}
+                </div>
+                <div class="flex gap-3 pt-2">
+                    <button type="submit" class="bg-brand-600 text-white py-2.5 px-6 rounded-lg hover:bg-brand-700 font-medium transition">
+                        Save
+                    </button>
+                    {% if metaprompt and metaprompt.project %}
+                    <a href="{% url 'project-detail' pk=metaprompt.project.pk %}" class="bg-gray-100 text-gray-700 py-2.5 px-6 rounded-lg hover:bg-gray-200 font-medium transition">Back to Project</a>
+                    {% else %}
+                    <a href="{% url 'home' %}" class="bg-gray-100 text-gray-700 py-2.5 px-6 rounded-lg hover:bg-gray-200 font-medium transition">Back</a>
+                    {% endif %}
+                    {% if metaprompt %}
+                    <a href="{% url 'metaprompt-delete' pk=metaprompt.pk %}" class="ml-auto text-sm text-red-500 hover:text-red-700 py-2.5">Delete</a>
+                    {% endif %}
+                </div>
+            </div>
+        </form>
+    </div>
+
+    {% if metaprompt and metaprompt.status == "published" %}
+    <!-- AI Category Suggestions -->
+    <div class="bg-white rounded-xl border p-6 mt-6">
+        <div class="flex items-center justify-between mb-3">
+            <h2 class="text-lg font-semibold text-gray-900">Category Tags</h2>
+            <button
+                hx-post="{% url 'metaprompt-categorize' pk=metaprompt.pk %}"
+                hx-target="#category-suggestions"
+                hx-swap="innerHTML"
+                hx-indicator="#ai-spinner"
+                class="text-sm bg-brand-600 text-white px-4 py-1.5 rounded-lg hover:bg-brand-700 transition">
+                Generate Tags with AI
+                <span id="ai-spinner" class="htmx-indicator ml-2">...</span>
+            </button>
+        </div>
+        {% if metaprompt.category_tags.all %}
+        <div class="flex gap-2 mb-3">
+            {% for tag in metaprompt.category_tags.all %}
+            <span class="bg-blue-50 text-blue-600 px-3 py-1 rounded-full text-sm">{{ tag.name }}</span>
+            {% endfor %}
+        </div>
+        {% endif %}
+        <div id="category-suggestions"></div>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}

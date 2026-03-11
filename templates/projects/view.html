@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}{{ project.title }} — Wovenry{% endblock %}
+{% block content %}
+<div class="mb-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <p class="text-sm text-gray-500 mb-1">Project View</p>
+            <h1 class="text-2xl font-bold text-gray-900">{{ project.title }}</h1>
+        </div>
+        {% if is_owner %}
+        <div class="flex items-center gap-3">
+            <!-- Visibility toggle -->
+            {% if project.visibility == "private" %}
+            <button
+                hx-get="{% url 'project-categories' pk=project.pk %}"
+                hx-target="#modal-container"
+                hx-swap="innerHTML"
+                class="bg-gray-100 text-gray-600 px-4 py-2 rounded-lg text-sm hover:bg-gray-200 transition">
+                Private — Make Public
+            </button>
+            {% else %}
+            <form method="post" action="{% url 'project-visibility' pk=project.pk %}">
+                {% csrf_token %}
+                <input type="hidden" name="visibility" value="private">
+                <button type="submit" class="bg-green-100 text-green-700 px-4 py-2 rounded-lg text-sm hover:bg-green-200 transition">
+                    Public — Make Private
+                </button>
+            </form>
+            {% endif %}
+            <a href="{% url 'project-edit' pk=project.pk %}" class="text-sm text-gray-500 hover:text-gray-700">Edit</a>
+            <a href="{% url 'project-delete' pk=project.pk %}" class="text-sm text-red-500 hover:text-red-700">Delete</a>
+        </div>
+        {% else %}
+        <div class="flex items-center gap-3">
+            <form method="post" action="{% url 'copy-project' pk=project.pk %}">
+                {% csrf_token %}
+                <button type="submit" class="bg-brand-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-brand-700 transition">
+                    Copy Project
+                </button>
+            </form>
+        </div>
+        {% endif %}
+    </div>
+    {% if project.description %}
+    <p class="text-gray-600 mt-2">{{ project.description }}</p>
+    {% endif %}
+    <div class="flex gap-2 mt-3">
+        {% for tag in project.category_tags.all %}
+        <span class="text-xs bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full">{{ tag.name }}</span>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Sort controls -->
+<div class="flex items-center justify-between mb-4">
+    <div class="flex items-center gap-2">
+        <span class="text-sm text-gray-500">Sort by:</span>
+        <button hx-get="{% url 'project-grid' pk=project.pk %}?sort=newest" hx-target="#metaprompt-grid" hx-swap="innerHTML"
+            class="text-sm px-3 py-1 rounded-full {% if sort == 'newest' %}bg-brand-600 text-white{% else %}bg-gray-100 text-gray-600 hover:bg-gray-200{% endif %} transition">
+            Newest
+        </button>
+        <button hx-get="{% url 'project-grid' pk=project.pk %}?sort=oldest" hx-target="#metaprompt-grid" hx-swap="innerHTML"
+            class="text-sm px-3 py-1 rounded-full {% if sort == 'oldest' %}bg-brand-600 text-white{% else %}bg-gray-100 text-gray-600 hover:bg-gray-200{% endif %} transition">
+            Oldest
+        </button>
+        <button hx-get="{% url 'project-grid' pk=project.pk %}?sort=title" hx-target="#metaprompt-grid" hx-swap="innerHTML"
+            class="text-sm px-3 py-1 rounded-full {% if sort == 'title' %}bg-brand-600 text-white{% else %}bg-gray-100 text-gray-600 hover:bg-gray-200{% endif %} transition">
+            Title
+        </button>
+    </div>
+</div>
+
+<div id="metaprompt-grid">
+    {% include "projects/_metaprompt_grid.html" %}
+</div>
+{% endblock %}

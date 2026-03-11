@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}My Cockpit — Wovenry{% endblock %}
+{% block content %}
+<div class="mb-6">
+    <h1 class="text-2xl font-bold text-gray-900">My Cockpit</h1>
+</div>
+
+<!-- Tabs -->
+<div class="border-b border-gray-200 mb-6">
+    <div class="flex gap-6" role="tablist">
+        <button
+            class="tab-btn pb-3 text-sm font-medium border-b-2 border-brand-600 text-brand-600"
+            hx-get="{% url 'cockpit-tab' tab='metaprompts' %}"
+            hx-target="#tab-content"
+            hx-swap="innerHTML"
+            onclick="switchTab(this)">
+            My Metaprompt Library
+        </button>
+        <button
+            class="tab-btn pb-3 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700"
+            hx-get="{% url 'cockpit-tab' tab='projects' %}"
+            hx-target="#tab-content"
+            hx-swap="innerHTML"
+            onclick="switchTab(this)">
+            My Project Library
+        </button>
+    </div>
+</div>
+
+<!-- Action Buttons -->
+<div class="flex gap-4 mb-8">
+    <a href="{% url 'project-create' %}" class="flex-1 bg-brand-600 text-white text-center py-3 px-4 rounded-lg hover:bg-brand-700 font-medium transition">
+        Create New Project
+    </a>
+    <a href="{% url 'metaprompt-create' %}" class="flex-1 bg-brand-600 text-white text-center py-3 px-4 rounded-lg hover:bg-brand-700 font-medium transition">
+        Create New Metaprompt
+    </a>
+</div>
+
+<!-- Tab Content -->
+<div id="tab-content">
+    {% include "cockpit/_tab_metaprompts.html" %}
+</div>
+
+<script>
+function switchTab(el) {
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('border-brand-600', 'text-brand-600');
+        btn.classList.add('border-transparent', 'text-gray-500');
+    });
+    el.classList.remove('border-transparent', 'text-gray-500');
+    el.classList.add('border-brand-600', 'text-brand-600');
+}
+</script>
+{% endblock %}

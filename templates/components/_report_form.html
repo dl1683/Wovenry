@@ -1,0 +1,21 @@
+<div id="report-modal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-xl shadow-xl p-6 w-full max-w-md mx-4">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">Report Content</h2>
+        <form method="post" action="{% url 'report' %}" hx-post="{% url 'report' %}" hx-target="#toast-container" hx-swap="innerHTML">
+            {% csrf_token %}
+            {% if project_id %}<input type="hidden" name="project_id" value="{{ project_id }}">{% endif %}
+            {% if metaprompt_id %}<input type="hidden" name="metaprompt_id" value="{{ metaprompt_id }}">{% endif %}
+            <div class="mb-4">
+                {{ form.reason }}
+            </div>
+            <div class="flex gap-3">
+                <button type="submit" class="flex-1 bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 font-medium transition">
+                    Submit Report
+                </button>
+                <button type="button" onclick="document.getElementById('report-modal').remove()" class="flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 font-medium transition">
+                    Cancel
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

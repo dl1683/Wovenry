@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Delete Metaprompt — Wovenry{% endblock %}
+{% block content %}
+<div class="max-w-md mx-auto mt-16">
+    <div class="bg-white rounded-xl shadow-sm border p-8 text-center">
+        <h1 class="text-xl font-bold text-gray-900 mb-2">Delete Metaprompt</h1>
+        <p class="text-gray-500 mb-6">Are you sure you want to delete <strong>{{ metaprompt.title }}</strong>? This cannot be undone.</p>
+        <form method="post">
+            {% csrf_token %}
+            <div class="flex gap-3 justify-center">
+                <button type="submit" class="bg-red-600 text-white py-2 px-6 rounded-lg hover:bg-red-700 font-medium transition">Delete</button>
+                <a href="{% url 'metaprompt-edit' pk=metaprompt.pk %}" class="bg-gray-100 text-gray-700 py-2 px-6 rounded-lg hover:bg-gray-200 font-medium transition">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

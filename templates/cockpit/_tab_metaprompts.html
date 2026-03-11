@@ -1,0 +1,30 @@
+{% load wovenry_tags %}
+
+{% if pinned %}
+<div class="mb-6">
+    <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Pinned Metaprompts</h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {% for item in pinned %}
+        {% include "components/_tile_metaprompt.html" with metaprompt=item show_controls=True %}
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<div>
+    <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">
+        {% if pinned %}Recent Metaprompts{% else %}My Metaprompts{% endif %}
+    </h2>
+    {% if recent %}
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {% for item in recent %}
+        {% include "components/_tile_metaprompt.html" with metaprompt=item show_controls=True %}
+        {% endfor %}
+    </div>
+    {% elif not pinned %}
+    <div class="text-center py-12 text-gray-400">
+        <p class="text-lg mb-2">No metaprompts yet</p>
+        <p class="text-sm">Create your first metaprompt to get started.</p>
+    </div>
+    {% endif %}
+</div>

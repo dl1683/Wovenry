@@ -1,0 +1,26 @@
+{% if suggested %}
+<div class="mt-3">
+    <p class="text-sm text-gray-600 mb-2">AI suggested these categories:</p>
+    <form method="post" action="{% url 'metaprompt-visibility' pk=metaprompt.pk %}">
+        {% csrf_token %}
+        <input type="hidden" name="visibility" value="public">
+        <div class="flex flex-wrap gap-2 mb-3">
+            {% for cat in suggested %}
+            <label class="flex items-center gap-1.5 bg-blue-50 text-blue-700 px-3 py-1.5 rounded-full cursor-pointer hover:bg-blue-100 transition">
+                <input type="checkbox" name="category_tags" value="{{ cat.pk }}" checked class="rounded text-brand-600">
+                <span class="text-sm">{{ cat.name }}</span>
+            </label>
+            {% endfor %}
+        </div>
+        <div class="flex gap-3">
+            <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-700 transition font-medium">
+                Apply Tags & Make Public
+            </button>
+        </div>
+    </form>
+</div>
+{% else %}
+<div class="mt-3 text-sm text-gray-500">
+    Could not generate tags. Make sure your GEMINI_API_KEY is set, and try again.
+</div>
+{% endif %}

@@ -1,0 +1,18 @@
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    {% if is_owner %}
+    <a href="{% url 'metaprompt-create' %}?project={{ project.pk }}" class="flex flex-col items-center justify-center bg-white rounded-xl border-2 border-dashed border-gray-300 p-8 hover:border-brand-500 hover:bg-brand-50 transition group min-h-[160px]">
+        <span class="text-4xl text-gray-300 group-hover:text-brand-500 transition mb-2">+</span>
+        <span class="text-sm text-gray-400 group-hover:text-brand-600 transition font-medium">Add Metaprompt</span>
+    </a>
+    {% endif %}
+
+    {% for mp in metaprompts %}
+    {% include "components/_tile_metaprompt.html" with metaprompt=mp show_controls=is_owner %}
+    {% endfor %}
+</div>
+
+{% if not metaprompts and not is_owner %}
+<div class="text-center py-12 text-gray-400">
+    <p class="text-lg mb-2">No public metaprompts in this project yet.</p>
+</div>
+{% endif %}

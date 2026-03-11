@@ -1,0 +1,33 @@
+<div id="category-modal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-xl shadow-xl p-6 w-full max-w-md mx-4">
+        <h2 class="text-lg font-semibold text-gray-900 mb-2">Select Categories</h2>
+        <p class="text-sm text-gray-500 mb-4">Choose 1 to 3 categories for this {{ item_type }}.</p>
+
+        {% if error %}
+        <div class="bg-red-50 text-red-700 p-3 rounded-lg mb-4 text-sm">{{ error }}</div>
+        {% endif %}
+
+        <form method="post" action="{% if item_type == 'project' %}{% url 'project-visibility' pk=item.pk %}{% else %}{% url 'metaprompt-visibility' pk=item.pk %}{% endif %}">
+            {% csrf_token %}
+            <input type="hidden" name="visibility" value="public">
+            <div class="grid grid-cols-2 gap-2 mb-6">
+                {% for cat in categories %}
+                <label class="flex items-center gap-2 p-2 rounded-lg border hover:bg-gray-50 cursor-pointer">
+                    <input type="checkbox" name="category_tags" value="{{ cat.pk }}"
+                        {% if cat in item.category_tags.all %}checked{% endif %}
+                        class="rounded text-brand-600">
+                    <span class="text-sm">{{ cat.name }}</span>
+                </label>
+                {% endfor %}
+            </div>
+            <div class="flex gap-3">
+                <button type="submit" class="flex-1 bg-brand-600 text-white py-2 px-4 rounded-lg hover:bg-brand-700 font-medium transition">
+                    Make Public
+                </button>
+                <button type="button" onclick="document.getElementById('category-modal').remove()" class="flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 font-medium transition">
+                    Cancel
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

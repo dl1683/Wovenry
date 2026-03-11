@@ -1,0 +1,22 @@
+<a href="{% url 'project-detail' pk=project.pk %}" class="block bg-white rounded-xl border border-gray-200 p-5 hover:shadow-md transition group">
+    <div class="flex items-start justify-between mb-2">
+        <h3 class="font-semibold text-gray-900 group-hover:text-brand-600 transition">
+            {% if project.is_pinned %}<span class="text-yellow-500 mr-1">&#9733;</span>{% endif %}
+            {{ project.title }}
+        </h3>
+        <span class="text-xs px-2 py-0.5 rounded-full {% if project.visibility == 'public' %}bg-green-100 text-green-700{% else %}bg-gray-100 text-gray-500{% endif %}">
+            {{ project.visibility|title }}
+        </span>
+    </div>
+    {% if project.description %}
+    <p class="text-sm text-gray-500 line-clamp-2 mb-3">{{ project.description }}</p>
+    {% endif %}
+    <div class="flex items-center gap-2 flex-wrap">
+        {% for tag in project.category_tags.all %}
+        <span class="text-xs bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full">{{ tag.name }}</span>
+        {% endfor %}
+    </div>
+    {% if not show_controls %}
+    <p class="text-xs text-gray-400 mt-2">by {{ project.owner.username }}</p>
+    {% endif %}
+</a>

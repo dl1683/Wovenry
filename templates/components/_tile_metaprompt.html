@@ -1,0 +1,31 @@
+{% if show_controls %}
+<a href="{% url 'metaprompt-edit' pk=metaprompt.pk %}" class="block bg-white rounded-xl border border-gray-200 p-5 hover:shadow-md transition group">
+{% else %}
+<a href="{% url 'mixer' pk=metaprompt.pk %}" class="block bg-white rounded-xl border border-gray-200 p-5 hover:shadow-md transition group">
+{% endif %}
+    <div class="flex items-start justify-between mb-2">
+        <h3 class="font-semibold text-gray-900 group-hover:text-brand-600 transition">
+            {% if metaprompt.is_pinned %}<span class="text-yellow-500 mr-1">&#9733;</span>{% endif %}
+            {{ metaprompt.title }}
+        </h3>
+        <div class="flex items-center gap-2">
+            {% if metaprompt.status == "draft" %}
+            <span class="text-xs px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-700">Draft</span>
+            {% endif %}
+            <span class="text-xs px-2 py-0.5 rounded-full {% if metaprompt.visibility == 'public' %}bg-green-100 text-green-700{% else %}bg-gray-100 text-gray-500{% endif %}">
+                {{ metaprompt.visibility|title }}
+            </span>
+        </div>
+    </div>
+    {% if metaprompt.description %}
+    <p class="text-sm text-gray-500 line-clamp-2 mb-3">{{ metaprompt.description }}</p>
+    {% endif %}
+    <div class="flex items-center gap-2 flex-wrap">
+        {% for tag in metaprompt.category_tags.all %}
+        <span class="text-xs bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full">{{ tag.name }}</span>
+        {% endfor %}
+    </div>
+    {% if not show_controls %}
+    <p class="text-xs text-gray-400 mt-2">by {{ metaprompt.owner.username }}</p>
+    {% endif %}
+</a>

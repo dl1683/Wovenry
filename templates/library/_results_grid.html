@@ -1,0 +1,15 @@
+{% if items %}
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    {% for item in items %}
+        {% if item_type == "project" %}
+            {% include "components/_tile_project.html" with project=item show_controls=False %}
+        {% else %}
+            {% include "components/_tile_metaprompt.html" with metaprompt=item show_controls=False %}
+        {% endif %}
+    {% endfor %}
+</div>
+{% else %}
+<div class="text-center py-12 text-gray-400">
+    <p class="text-lg">No results found.</p>
+</div>
+{% endif %}

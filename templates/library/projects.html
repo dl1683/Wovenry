@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Public Projects — Wovenry{% endblock %}
+{% block content %}
+<h1 class="text-2xl font-bold text-gray-900 mb-6">Public Projects</h1>
+
+<!-- Search -->
+<div class="mb-4">
+    <input type="search" name="q" value="{{ q }}"
+        placeholder="Search public projects..."
+        hx-get="{% url 'library-projects' %}"
+        hx-trigger="input changed delay:300ms, search"
+        hx-target="#results-grid"
+        hx-swap="innerHTML"
+        hx-include="[name='category']"
+        class="w-full max-w-lg px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500">
+</div>
+
+<!-- Category Pills -->
+<div class="flex gap-2 mb-6 overflow-x-auto pb-2">
+    <input type="hidden" name="category" value="{{ active_category }}" id="active-category">
+    <button onclick="filterCategory('')"
+        class="pill px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition {% if not active_category %}bg-brand-600 text-white{% else %}bg-gray-100 text-gray-600 hover:bg-gray-200{% endif %}">
+        All
+    </button>
+    {% for cat in categories %}
+    <button onclick="filterCategory('{{ cat.slug }}')"
+        class="pill px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition {% if active_category == cat.slug %}bg-brand-600 text-white{% else %}bg-gray-100 text-gray-600 hover:bg-gray-200{% endif %}">
+        {{ cat.name }}
+    </button>
+    {% endfor %}
+</div>
+
+<div id="results-grid">
+    {% include "library/_results_grid.html" with items=projects item_type="project" %}
+</div>
+
+<script>
+function filterCategory(slug) {
+    document.getElementById('active-category').value = slug;
+    const searchInput = document.querySelector('input[name="q"]');
+    const url = new URL('{% url "library-projects" %}', window.location.origin);
+    if (slug) url.searchParams.set('category', slug);
+    if (searchInput.value) url.searchParams.set('q', searchInput.value);
+    htmx.ajax('GET', url.toString(), {target: '#results-grid', swap: 'innerHTML'});
+
+    document.querySelectorAll('.pill').forEach((btn, i) => {
+        const isActive = (i === 0 && !slug) || btn.textContent.trim() === document.querySelector(`[onclick="filterCategory('${slug}')"]`)?.textContent.trim();
+        btn.classList.toggle('bg-brand-600', isActive);
+        btn.classList.toggle('text-white', isActive);
+        btn.classList.toggle('bg-gray-100', !isActive);
+        btn.classList.toggle('text-gray-600', !isActive);
+    });
+}
+</script>
+{% endblock %}
