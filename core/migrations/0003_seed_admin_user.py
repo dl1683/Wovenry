@@ -1,4 +1,5 @@
 from django.db import migrations
+from django.contrib.auth.hashers import make_password
 
 
 def seed_admin(apps, schema_editor):
@@ -8,15 +9,14 @@ def seed_admin(apps, schema_editor):
     AllowedEmail.objects.get_or_create(email="admin@wovenry.com")
 
     if not User.objects.filter(username="admin").exists():
-        user = User(
+        User.objects.create(
             username="admin",
             email="admin@wovenry.com",
+            password=make_password("admin123"),
             is_superuser=True,
             is_staff=True,
             is_active=True,
         )
-        user.set_password("admin123")
-        user.save()
 
 
 def unseed_admin(apps, schema_editor):
