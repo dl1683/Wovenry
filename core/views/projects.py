@@ -1,6 +1,7 @@
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 
 from core.forms import ProjectForm
 from core.models import Category, Project
@@ -13,6 +14,14 @@ def create(request):
         project = form.save(commit=False)
         project.owner = request.user
         project.save()
+
+        save_action = request.POST.get("save_action", "save_private")
+        if save_action == "save_publish":
+            messages.success(request, "Saved! Select categories to publish.")
+            return redirect(
+                reverse("project-detail", kwargs={"pk": project.pk}) + "?show_categories=1"
+            )
+        messages.success(request, "Saved to Private Library.")
         return redirect("project-detail", pk=project.pk)
     return render(request, "projects/create.html", {"form": form})
 
@@ -35,12 +44,14 @@ def detail(request, pk):
         metaprompts = metaprompts.order_by("-created_at")
 
     categories = Category.objects.all()
+    show_categories = request.GET.get("show_categories") == "1"
     return render(request, "projects/view.html", {
         "project": project,
         "metaprompts": metaprompts,
         "categories": categories,
         "is_owner": project.owner == request.user,
         "sort": sort,
+        "show_categories": show_categories,
     })
 
 
@@ -50,6 +61,7 @@ def edit(request, pk):
     form = ProjectForm(request.POST or None, instance=project)
     if request.method == "POST" and form.is_valid():
         form.save()
+        messages.success(request, "Changes saved.")
         return redirect("project-detail", pk=project.pk)
     return render(request, "projects/create.html", {"form": form, "editing": True, "project": project})
 
@@ -84,17 +96,21 @@ def toggle_visibility(request, pk):
             tag_ids = request.POST.getlist("category_tags")
             if not tag_ids or len(tag_ids) > 3:
                 categories = Category.objects.all()
+                form_action = reverse("project-visibility", kwargs={"pk": pk})
                 return render(request, "components/_category_modal.html", {
                     "item": project, "categories": categories,
                     "error": "Select 1 to 3 categories.", "item_type": "project",
+                    "mode": "publish", "form_action": form_action,
                 })
             project.visibility = "public"
             project.save(update_fields=["visibility"])
             project.category_tags.set(tag_ids)
+            messages.success(request, "Published to Public Library.")
         else:
             project.visibility = "private"
             project.save(update_fields=["visibility"])
             project.category_tags.clear()
+            messages.success(request, "Removed from Public Library.")
     return redirect("project-detail", pk=project.pk)
 
 
@@ -102,9 +118,33 @@ def toggle_visibility(request, pk):
 def category_modal(request, pk):
     project = get_object_or_404(Project, pk=pk, owner=request.user)
     categories = Category.objects.all()
+    mode = request.GET.get("mode", "publish")
+    if mode == "edit":
+        form_action = reverse("project-save-categories", kwargs={"pk": pk})
+    else:
+        form_action = reverse("project-visibility", kwargs={"pk": pk})
     return render(request, "components/_category_modal.html", {
         "item": project, "categories": categories, "item_type": "project",
+        "mode": mode, "form_action": form_action,
     })
+
+
+@login_required
+def save_categories(request, pk):
+    project = get_object_or_404(Project, pk=pk, owner=request.user)
+    if request.method == "POST":
+        tag_ids = request.POST.getlist("category_tags")
+        if not tag_ids or len(tag_ids) > 3:
+            categories = Category.objects.all()
+            form_action = reverse("project-save-categories", kwargs={"pk": pk})
+            return render(request, "components/_category_modal.html", {
+                "item": project, "categories": categories,
+                "error": "Select 1 to 3 categories.", "item_type": "project",
+                "mode": "edit", "form_action": form_action,
+            })
+        project.category_tags.set(tag_ids)
+        messages.success(request, "Tags updated.")
+    return redirect("project-detail", pk=project.pk)
 
 
 @login_required

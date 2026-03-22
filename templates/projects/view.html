@@ -9,24 +9,6 @@
         </div>
         {% if is_owner %}
         <div class="flex items-center gap-3">
-            <!-- Visibility toggle -->
-            {% if project.visibility == "private" %}
-            <button
-                hx-get="{% url 'project-categories' pk=project.pk %}"
-                hx-target="#modal-container"
-                hx-swap="innerHTML"
-                class="bg-gray-100 text-gray-600 px-4 py-2 rounded-lg text-sm hover:bg-gray-200 transition">
-                Private — Make Public
-            </button>
-            {% else %}
-            <form method="post" action="{% url 'project-visibility' pk=project.pk %}">
-                {% csrf_token %}
-                <input type="hidden" name="visibility" value="private">
-                <button type="submit" class="bg-green-100 text-green-700 px-4 py-2 rounded-lg text-sm hover:bg-green-200 transition">
-                    Public — Make Private
-                </button>
-            </form>
-            {% endif %}
             <a href="{% url 'project-edit' pk=project.pk %}" class="text-sm text-gray-500 hover:text-gray-700">Edit</a>
             <a href="{% url 'project-delete' pk=project.pk %}" class="text-sm text-red-500 hover:text-red-700">Delete</a>
         </div>
@@ -44,11 +26,40 @@
     {% if project.description %}
     <p class="text-gray-600 mt-2">{{ project.description }}</p>
     {% endif %}
-    <div class="flex gap-2 mt-3">
+    <div class="flex items-center gap-2 mt-3">
         {% for tag in project.category_tags.all %}
         <span class="text-xs bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full">{{ tag.name }}</span>
         {% endfor %}
+        {% if is_owner and project.visibility == "public" and project.category_tags.all %}
+        <button
+            hx-get="{% url 'project-categories' pk=project.pk %}?mode=edit"
+            hx-target="#modal-container"
+            hx-swap="innerHTML"
+            class="text-xs text-gray-400 hover:text-gray-600 ml-1">Edit Tags</button>
+        {% endif %}
     </div>
+
+    {% if is_owner %}
+    <div class="mt-4">
+        {% if project.visibility == "private" %}
+        <button
+            hx-get="{% url 'project-categories' pk=project.pk %}"
+            hx-target="#modal-container"
+            hx-swap="innerHTML"
+            class="bg-green-600 text-white px-5 py-2.5 rounded-lg text-sm hover:bg-green-700 transition font-medium">
+            Publish
+        </button>
+        {% else %}
+        <form method="post" action="{% url 'project-visibility' pk=project.pk %}">
+            {% csrf_token %}
+            <input type="hidden" name="visibility" value="private">
+            <button type="submit" class="bg-red-50 text-red-600 px-5 py-2.5 rounded-lg text-sm hover:bg-red-100 transition font-medium">
+                Remove from Public Library
+            </button>
+        </form>
+        {% endif %}
+    </div>
+    {% endif %}
 </div>
 
 <!-- Sort controls -->
@@ -73,4 +84,12 @@
 <div id="metaprompt-grid">
     {% include "projects/_metaprompt_grid.html" %}
 </div>
+
+{% if show_categories %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        htmx.ajax('GET', '{% url "project-categories" pk=project.pk %}', {target: '#modal-container', swap: 'innerHTML'});
+    });
+</script>
+{% endif %}
 {% endblock %}

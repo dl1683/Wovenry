@@ -18,13 +18,21 @@
                     {{ form.description }}
                 </div>
                 <div class="flex gap-3 pt-2">
-                    <button type="submit" class="bg-brand-600 text-white py-2.5 px-6 rounded-lg hover:bg-brand-700 font-medium transition">
-                        {% if editing %}Save Changes{% else %}Create Project{% endif %}
-                    </button>
                     {% if editing %}
-                    <a href="{% url 'project-detail' pk=project.pk %}" class="bg-gray-100 text-gray-700 py-2.5 px-6 rounded-lg hover:bg-gray-200 font-medium transition">Cancel</a>
+                        <button type="submit" class="bg-brand-600 text-white py-2.5 px-6 rounded-lg hover:bg-brand-700 font-medium transition">
+                            Save Changes
+                        </button>
+                        <a href="{% url 'project-detail' pk=project.pk %}" class="bg-gray-100 text-gray-700 py-2.5 px-6 rounded-lg hover:bg-gray-200 font-medium transition">Cancel</a>
                     {% else %}
-                    <a href="{% url 'home' %}" class="bg-gray-100 text-gray-700 py-2.5 px-6 rounded-lg hover:bg-gray-200 font-medium transition">Cancel</a>
+                        <button type="submit" name="save_action" value="save_private"
+                            class="bg-brand-600 text-white py-2.5 px-6 rounded-lg hover:bg-brand-700 font-medium transition">
+                            Save to Private Library
+                        </button>
+                        <button type="submit" name="save_action" value="save_publish"
+                            class="bg-green-600 text-white py-2.5 px-6 rounded-lg hover:bg-green-700 font-medium transition">
+                            Save &amp; Publish
+                        </button>
+                        <a href="{% url 'home' %}" class="bg-gray-100 text-gray-700 py-2.5 px-6 rounded-lg hover:bg-gray-200 font-medium transition">Cancel</a>
                     {% endif %}
                 </div>
             </div>

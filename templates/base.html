@@ -39,11 +39,16 @@
                 <div class="flex items-center gap-6">
                     {% if user.is_authenticated %}
                     <a href="{% url 'home' %}" class="text-sm text-gray-600 hover:text-gray-900 {% if request.path == '/' %}font-semibold text-gray-900{% endif %}">Home</a>
-                    <div class="relative group">
-                        <a href="#" class="text-sm text-gray-600 hover:text-gray-900 {% if 'library' in request.path %}font-semibold text-gray-900{% endif %}">Public Library</a>
-                        <div class="hidden group-hover:block absolute right-0 mt-1 w-48 bg-white border rounded-lg shadow-lg py-1 z-50">
-                            <a href="{% url 'library-projects' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Public Projects</a>
-                            <a href="{% url 'library-metaprompts' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Public Metaprompts</a>
+                    <div class="relative" id="library-menu">
+                        <button type="button" id="library-menu-btn"
+                            class="text-sm text-gray-600 hover:text-gray-900 {% if 'library' in request.path %}font-semibold text-gray-900{% endif %}">
+                            Public Library
+                        </button>
+                        <div id="library-dropdown" class="hidden absolute right-0 pt-1 z-50">
+                            <div class="w-48 bg-white border rounded-lg shadow-lg py-1">
+                                <a href="{% url 'library-projects' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Public Projects</a>
+                                <a href="{% url 'library-metaprompts' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Public Metaprompts</a>
+                            </div>
                         </div>
                     </div>
                     <div class="flex items-center gap-3">
@@ -72,5 +77,33 @@
 
     <div id="modal-container"></div>
     <div id="toast-container" class="fixed bottom-4 right-4 z-50"></div>
+
+    <script>
+    (function() {
+        var btn = document.getElementById('library-menu-btn');
+        var dd = document.getElementById('library-dropdown');
+        var menu = document.getElementById('library-menu');
+        if (!btn || !dd || !menu) return;
+
+        btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            dd.classList.toggle('hidden');
+        });
+
+        menu.addEventListener('mouseenter', function() {
+            dd.classList.remove('hidden');
+        });
+
+        menu.addEventListener('mouseleave', function() {
+            dd.classList.add('hidden');
+        });
+
+        document.addEventListener('click', function(e) {
+            if (!menu.contains(e.target)) {
+                dd.classList.add('hidden');
+            }
+        });
+    })();
+    </script>
 </body>
 </html>

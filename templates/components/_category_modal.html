@@ -1,16 +1,20 @@
 <div id="category-modal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
     <div class="bg-white rounded-xl shadow-xl p-6 w-full max-w-md mx-4">
-        <h2 class="text-lg font-semibold text-gray-900 mb-2">Select Categories</h2>
+        <h2 class="text-lg font-semibold text-gray-900 mb-2">
+            {% if mode == "edit" %}Edit Category Tags{% else %}Select Categories to Publish{% endif %}
+        </h2>
         <p class="text-sm text-gray-500 mb-4">Choose 1 to 3 categories for this {{ item_type }}.</p>
 
         {% if error %}
         <div class="bg-red-50 text-red-700 p-3 rounded-lg mb-4 text-sm">{{ error }}</div>
         {% endif %}
 
-        <form method="post" action="{% if item_type == 'project' %}{% url 'project-visibility' pk=item.pk %}{% else %}{% url 'metaprompt-visibility' pk=item.pk %}{% endif %}">
+        <form method="post" action="{{ form_action }}">
             {% csrf_token %}
+            {% if mode != "edit" %}
             <input type="hidden" name="visibility" value="public">
-            <div class="grid grid-cols-2 gap-2 mb-6">
+            {% endif %}
+            <div id="category-checkboxes" class="grid grid-cols-2 gap-2 mb-4">
                 {% for cat in categories %}
                 <label class="flex items-center gap-2 p-2 rounded-lg border hover:bg-gray-50 cursor-pointer">
                     <input type="checkbox" name="category_tags" value="{{ cat.pk }}"
@@ -20,9 +24,25 @@
                 </label>
                 {% endfor %}
             </div>
+
+            {% if item_type == "metaprompt" %}
+            <div class="mb-4">
+                <button type="button"
+                    hx-post="{% url 'metaprompt-categorize' pk=item.pk %}"
+                    hx-target="#ai-suggest-result"
+                    hx-swap="innerHTML"
+                    hx-indicator="#ai-spinner"
+                    class="text-sm bg-purple-50 text-purple-700 px-4 py-2 rounded-lg hover:bg-purple-100 transition w-full font-medium">
+                    Generate Tags with AI
+                    <span id="ai-spinner" class="htmx-indicator ml-2">...</span>
+                </button>
+                <div id="ai-suggest-result" class="mt-2"></div>
+            </div>
+            {% endif %}
+
             <div class="flex gap-3">
                 <button type="submit" class="flex-1 bg-brand-600 text-white py-2 px-4 rounded-lg hover:bg-brand-700 font-medium transition">
-                    Make Public
+                    {% if mode == "edit" %}Save Tags{% else %}Publish{% endif %}
                 </button>
                 <button type="button" onclick="document.getElementById('category-modal').remove()" class="flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 font-medium transition">
                     Cancel
