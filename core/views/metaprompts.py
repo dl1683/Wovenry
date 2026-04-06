@@ -77,9 +77,10 @@ def edit(request, pk):
 
     categories = Category.objects.all()
     show_categories = request.GET.get("show_categories") == "1"
+    user_projects = Project.objects.filter(owner=request.user)
     return render(request, "metaprompts/editor.html", {
         "form": form, "metaprompt": mp, "categories": categories,
-        "show_categories": show_categories,
+        "show_categories": show_categories, "user_projects": user_projects,
     })
 
 
@@ -180,6 +181,21 @@ def save_categories(request, pk):
             })
         mp.category_tags.set(tag_ids)
         messages.success(request, "Tags updated.")
+    return redirect("metaprompt-edit", pk=mp.pk)
+
+
+@login_required
+def set_project(request, pk):
+    mp = get_object_or_404(Metaprompt, pk=pk, owner=request.user)
+    if request.method == "POST":
+        project_id = request.POST.get("project_id") or None
+        if project_id:
+            project = get_object_or_404(Project, pk=project_id, owner=request.user)
+            mp.project = project
+        else:
+            mp.project = None
+        mp.save(update_fields=["project"])
+        messages.success(request, "Project updated.")
     return redirect("metaprompt-edit", pk=mp.pk)
 
 

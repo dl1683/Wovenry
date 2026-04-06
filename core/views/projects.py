@@ -4,7 +4,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
 from core.forms import ProjectForm
-from core.models import Category, Project
+from core.models import Category, Metaprompt, Project
 
 
 @login_required
@@ -150,6 +150,9 @@ def save_categories(request, pk):
 @login_required
 def metaprompt_grid(request, pk):
     project = get_object_or_404(Project, pk=pk)
+    if project.visibility == "private" and project.owner != request.user:
+        return render(request, "403.html", status=403)
+
     sort = request.GET.get("sort", "newest")
     metaprompts = project.metaprompts.all()
     if project.owner != request.user:
@@ -164,4 +167,23 @@ def metaprompt_grid(request, pk):
     return render(request, "projects/_metaprompt_grid.html", {
         "metaprompts": metaprompts, "project": project,
         "is_owner": project.owner == request.user, "sort": sort,
+    })
+
+
+@login_required
+def add_metaprompt(request, pk):
+    project = get_object_or_404(Project, pk=pk, owner=request.user)
+    if request.method == "POST":
+        mp_id = request.POST.get("metaprompt_id")
+        if mp_id:
+            mp = get_object_or_404(Metaprompt, pk=mp_id, owner=request.user)
+            mp.project = project
+            mp.save(update_fields=["project"])
+            messages.success(request, f'"{mp.title}" added to project.')
+        return redirect("project-detail", pk=project.pk)
+
+    available = Metaprompt.objects.filter(owner=request.user).exclude(project=project).select_related("project").order_by("title")
+    return render(request, "projects/_add_metaprompt_modal.html", {
+        "project": project,
+        "available": available,
     })

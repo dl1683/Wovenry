@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.models import User
-from .models import Project, Metaprompt, Report, AllowedEmail
+from .models import Project, Metaprompt, Report
 
 
 class RegisterForm(forms.Form):
@@ -24,9 +24,6 @@ class RegisterForm(forms.Form):
     def clean(self):
         cleaned = super().clean()
         email = cleaned.get("email", "").lower()
-
-        if not AllowedEmail.objects.filter(email=email, registered=False).exists():
-            raise forms.ValidationError("This email is not on the invite list.")
 
         if cleaned.get("password") != cleaned.get("password_confirm"):
             raise forms.ValidationError("Passwords do not match.")

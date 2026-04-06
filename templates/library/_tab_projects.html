@@ -1,0 +1,39 @@
+<div class="mb-4">
+    <input type="search" name="q" value="{{ q }}"
+        placeholder="Search public projects..."
+        hx-get="{% url 'library-tab' tab='projects' %}"
+        hx-trigger="input changed delay:300ms, search"
+        hx-target="#tab-content"
+        hx-swap="innerHTML"
+        hx-include="[name='category']"
+        class="w-full max-w-lg px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500">
+</div>
+
+<div class="flex gap-2 mb-6 overflow-x-auto pb-2">
+    <input type="hidden" name="category" value="{{ active_category }}" id="active-category">
+    <button onclick="filterCategory('')"
+        class="pill px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition {% if not active_category %}bg-brand-600 text-white{% else %}bg-gray-100 text-gray-600 hover:bg-gray-200{% endif %}">
+        All
+    </button>
+    {% for cat in categories %}
+    <button onclick="filterCategory('{{ cat.slug }}')"
+        class="pill px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition {% if active_category == cat.slug %}bg-brand-600 text-white{% else %}bg-gray-100 text-gray-600 hover:bg-gray-200{% endif %}">
+        {{ cat.name }}
+    </button>
+    {% endfor %}
+</div>
+
+<div id="results-grid">
+    {% include "library/_results_grid.html" with items=projects item_type="project" %}
+</div>
+
+<script>
+function filterCategory(slug) {
+    document.getElementById('active-category').value = slug;
+    const searchInput = document.querySelector('input[name="q"]');
+    const url = new URL('{% url "library-tab" tab="projects" %}', window.location.origin);
+    if (slug) url.searchParams.set('category', slug);
+    if (searchInput && searchInput.value) url.searchParams.set('q', searchInput.value);
+    htmx.ajax('GET', url.toString(), {target: '#tab-content', swap: 'innerHTML'});
+}
+</script>

@@ -1,9 +1,13 @@
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
     {% if is_owner %}
-    <a href="{% url 'metaprompt-create' %}?project={{ project.pk }}" class="flex flex-col items-center justify-center bg-white rounded-xl border-2 border-dashed border-gray-300 p-8 hover:border-brand-500 hover:bg-brand-50 transition group min-h-[160px]">
+    <button
+        hx-get="{% url 'project-add-metaprompt' pk=project.pk %}"
+        hx-target="#modal-container"
+        hx-swap="innerHTML"
+        class="flex flex-col items-center justify-center bg-white rounded-xl border-2 border-dashed border-gray-300 p-8 hover:border-brand-500 hover:bg-brand-50 transition group min-h-[160px] w-full">
         <span class="text-4xl text-gray-300 group-hover:text-brand-500 transition mb-2">+</span>
         <span class="text-sm text-gray-400 group-hover:text-brand-600 transition font-medium">Add Metaprompt</span>
-    </a>
+    </button>
     {% endif %}
 
     {% for mp in metaprompts %}

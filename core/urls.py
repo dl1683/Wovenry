@@ -21,6 +21,7 @@ urlpatterns = [
     path("projects/<int:pk>/categories/", projects.category_modal, name="project-categories"),
     path("projects/<int:pk>/grid/", projects.metaprompt_grid, name="project-grid"),
     path("projects/<int:pk>/save-categories/", projects.save_categories, name="project-save-categories"),
+    path("projects/<int:pk>/add-metaprompt/", projects.add_metaprompt, name="project-add-metaprompt"),
 
     # Metaprompts
     path("metaprompts/new/", metaprompts.create, name="metaprompt-create"),
@@ -32,8 +33,11 @@ urlpatterns = [
     path("metaprompts/<int:pk>/categorize/", metaprompts.ai_categorize, name="metaprompt-categorize"),
     path("metaprompts/<int:pk>/categories/", metaprompts.category_modal, name="metaprompt-categories"),
     path("metaprompts/<int:pk>/save-categories/", metaprompts.save_categories, name="metaprompt-save-categories"),
+    path("metaprompts/<int:pk>/set-project/", metaprompts.set_project, name="metaprompt-set-project"),
 
-    # Public libraries
+    # Public library
+    path("library/", library.public_library, name="library"),
+    path("library/tab/<str:tab>/", library.library_tab, name="library-tab"),
     path("library/projects/", library.public_projects, name="library-projects"),
     path("library/metaprompts/", library.public_metaprompts, name="library-metaprompts"),
 
