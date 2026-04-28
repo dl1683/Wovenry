@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.shortcuts import redirect, render
 
 from core.forms import LoginForm, RegisterForm
+from core.models import AllowedEmail
 
 
 def login_view(request):
@@ -36,6 +37,7 @@ def register_view(request):
             email=email,
             password=form.cleaned_data["password"],
         )
+        AllowedEmail.objects.filter(email=email).update(registered=True)
         login(request, user)
         return redirect("home")
 

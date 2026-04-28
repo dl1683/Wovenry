@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.models import User
-from .models import Project, Metaprompt, Report
+from .models import AllowedEmail, Project, Metaprompt, Report
 
 
 class RegisterForm(forms.Form):
@@ -33,6 +33,12 @@ class RegisterForm(forms.Form):
 
         if User.objects.filter(email=email).exists():
             raise forms.ValidationError("An account with this email already exists.")
+
+        invite = AllowedEmail.objects.filter(email=email).first()
+        if not invite:
+            raise forms.ValidationError("This email is not on the invite list.")
+        if invite.registered:
+            raise forms.ValidationError("This invite has already been used.")
 
         return cleaned
 
